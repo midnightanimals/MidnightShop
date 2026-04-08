@@ -4,11 +4,11 @@
 const CART_KEY = "cart_items";
 
 const SHIPPING_OPTIONS = [
-  { id: "cod_711", label: "7-11 賣貨便（取貨付款）", fee: 0 },
-  { id: "pickup_711", label: "7-11 純取貨", fee: 60 },
-  { id: "cod_family", label: "全家好賣家（取貨付款）", fee: 0 },
-  { id: "pickup_family", label: "全家純取貨（小物袋）", fee: 42 },
-  { id: "home", label: "宅配", fee: 120 }
+  { id: "cod_711", label: "7-11 賣貨便/取貨付款－依平台運費為準", fee: 0 },
+  { id: "pickup_711", label: "7-11 純取貨－保值寄送請另外提出", fee: 60 },
+  { id: "cod_family", label: "全家好賣家/取貨付款－依平台運費為準", fee: 0 },
+  { id: "pickup_family", label: "全家純取貨－小物袋", fee: 42 },
+  { id: "home", label: "宅配－運費到付", fee: 0 }
 ];
 
 /* =====================
@@ -97,7 +97,7 @@ function getOptionLabel(key, val, data) {
 function initShippingOptions() {
   const $sel = $("#shippingMethod");
   $sel.empty(); // 清空避免重複
-  $sel.append('<option value="" disabled selected>請選擇寄送方式...</option>'); // 加入預設選項
+  $sel.append('<option value="" disabled selected>請選擇寄送方式</option>'); // 加入預設選項
   SHIPPING_OPTIONS.forEach(o => {
     $sel.append(
       `<option value="${o.id}">
@@ -172,7 +172,7 @@ function renderCart(productData) {
   $area.empty();
 
   if (!cart.length) {
-    $area.html(`<div class="py-5 text-center text-muted">購物車目前沒有商品。</div>`);
+    $area.html(`<div class="py-5 text-center text-muted">購物車目前沒有東西，等你挑選心儀的商品喔！<br/>*･゜ﾟ･*:.｡..｡.:*･'(*ﾟ▽ﾟ*)'･*:.｡. .｡.:*･゜ﾟ･*</div>`);
     $("#sendOrder").prop("disabled", true);
     $("#buildOrder").prop("disabled", true);
     // 更新總計為 0
@@ -204,7 +204,7 @@ function renderCart(productData) {
               <input class="form-control text-center qty-input" data-i="${idx}" inputmode="numeric" value="${item.qty}" min="1">
               <button class="btn btn-outline-secondary plus" data-i="${idx}">+</button>
             </div>
-            <div class="fw-bold text-primary">
+            <div class="fw-bold">
               NT$ ${(item.unitPrice * item.qty).toLocaleString()}
             </div>
           </div>
@@ -216,7 +216,8 @@ function renderCart(productData) {
   // 總計區域
   $area.append(`
     <div class="cart-total-area text-end mt-4 pt-3 border-top">
-      <h4 class="fw-bold">總計：NT$ ${calcTotal(cart).toLocaleString()}</h4>
+      <h4 class="fw-bold">商品總計：NT$ ${calcTotal(cart).toLocaleString()}</h4>
+      <small>(不含運費)</small>
     </div>
   `);
 }
@@ -265,59 +266,59 @@ $(async function () {
       saveCart(cart);
       renderCart(productData);
     })
-.on("click", ".remove", function () {
-    // 1. 先把 index 存起來，因為進入 callback 後 $(this) 會抓不到
-    const targetIndex = $(this).data("i");
+    .on("click", ".remove", function () {
+      // 1. 先把 index 存起來，因為進入 callback 後 $(this) 會抓不到
+      const targetIndex = $(this).data("i");
 
-    // 2. 呼叫小精靈彈窗
-    fairyModal({
+      // 2. 呼叫小精靈彈窗
+      fairyModal({
         type: "warning",
-        message: "確定要將此商品移出購物車嗎？<br/>小精靈會捨不得喔！( ;´Д`)ノ",
+        message: "確定要將此商品移出購物車嗎？<br/>小精靈會捨不得的( ;´Д`)ノ",
         buttons: [
-            { 
-                text: "先不要", 
-                class: "btn_sub" 
-            },
-            { 
-                text: "確定移除", 
-                class: "btn_main", 
-                onClick: function() {
-                    // 原本寫在 confirm 下方的邏輯全部搬到這裡
-                    const cart = getCart();
-                    cart.splice(targetIndex, 1);
-                    saveCart(cart);
-                    renderCart(productData);
-                    
-                    // (加碼) 移除後的成功通知
-                    fairyModal({ type: "success", message: "商品已成功移出倉庫囉！" });
-                } 
+          {
+            text: "考慮一下",
+            class: "btn_sub"
+          },
+          {
+            text: "我就是要刪",
+            class: "btn_main",
+            onClick: function () {
+              // 原本寫在 confirm 下方的邏輯全部搬到這裡
+              const cart = getCart();
+              cart.splice(targetIndex, 1);
+              saveCart(cart);
+              renderCart(productData);
+
+              // (加碼) 移除後的成功通知
+              fairyModal({ type: "success", message: "商品已成功移出購物車囉！小精靈會想它的(；´Д`A" });
             }
+          }
         ]
+      });
     });
-});
 
   // 產生訂單預覽
   $("#buildOrder").on("click", () => {
     const cart = getCart();
     const shipId = $("#shippingMethod").val();
-if (!shipId) {
-    fairyModal({
+    if (!shipId) {
+      fairyModal({
         type: "info",
-        message: "請先選擇寄送方式，小精靈才不會迷路喔！<br/>🧭✨",
+        message: "請先選擇寄送方式，小精靈才不會迷路喔！<br/>( ;´Д`)ノ",
         buttons: [{
-            text: "這就去選",
-            class: "btn_main",
-            onClick: function() {
-                // 當使用者按下彈窗按鈕時，自動聚焦到該欄位
-                $("#shippingMethod").focus();
-            }
+          text: "這就去選",
+          class: "btn_main",
+          onClick: function () {
+            // 當使用者按下彈窗按鈕時，自動聚焦到該欄位
+            $("#shippingMethod").focus();
+          }
         }]
-    });
-    
-    // 雖然彈窗是異步的，但我們必須在這裡 return 
-    // 這樣下方的「送出訂單 API」才不會被執行
-    return;
-}
+      });
+
+      // 雖然彈窗是異步的，但我們必須在這裡 return 
+      // 這樣下方的「送出訂單 API」才不會被執行
+      return;
+    }
 
     const shipping = SHIPPING_OPTIONS.find(s => s.id === shipId);
     latestOrder = buildOrderText(cart, productData, shipping);
@@ -355,21 +356,21 @@ if (!shipId) {
     // 1. 基本檢查
     // 情境：購物車為空、未選寄送方式、未填 Email
     if (cart.length === 0) {
-      fairyModal({ type: "warning", message: "購物車空空的，小精靈沒東西可以搬呀！" });
+      fairyModal({ type: "warning", message: "購物車空空的，小精靈沒東西可以搬呀！╮(￣▽￣)╭" });
       return; // 記得還是要 return，防止後續程式執行
     }
     if (!shipId) {
-      fairyModal({ type: "info", message: "請先選擇寄送方式，小精靈才不會迷路喔！" });
+      fairyModal({ type: "info", message: "請先選擇寄送方式，小精靈才不會迷路喔！（；゜０゜）" });
       return;
     }
 
     if (!email) {
-      fairyModal({ type: "info", message: "請填寫 Email，以便小精靈把確認信飛鴿傳書給您！" });
+      fairyModal({ type: "info", message: "請填寫 Email，以便小精靈把確認信飛鴿傳書給您！(=ﾟωﾟ)ﾉ" });
       return;
     }
 
     // 2. 顯示 Loading
-    toggleLoading(true, "fetching");
+    toggleLoading(true, "saving");
 
     try {
       // 3. 取得寄送設定
@@ -399,17 +400,22 @@ if (!shipId) {
       });
 
       // 7. 成功處理
-      // 成功通知
+      // 先清除購物車並更新畫面（購物車變空，但 modal 仍會顯示）
+      localStorage.removeItem(CART_KEY);
+      renderCart(productData); // 重新渲染空購物車
+
+      // 顯示成功通知，並將回首頁的跳轉寫在按鈕回呼中
       fairyModal({
         type: "success",
-        message: "訂單已送出，感謝您的購買！<br/>小精靈正全速處理中 ✨",
+        message: "訂單已送出，感謝您的購買！<br/>小精靈正全速處理中(￣^￣)ゞ",
         buttons: [
-          { text: "回首頁", class: "btn_main", onClick: () => location.href = 'index.php' },
-          { text: "好喔", class: "btn_sub" }
+          {
+            text: "回首頁",
+            class: "btn_main",
+            onClick: () => location.href = 'index.html'
+          }
         ]
       });
-      localStorage.removeItem(CART_KEY);
-      location.reload(); // 重新整理清空畫面
 
     } catch (err) {
       console.error("發送錯誤：", err);

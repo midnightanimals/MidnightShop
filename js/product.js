@@ -1,3 +1,59 @@
+const BUDDY_QUOTES = {
+  select: [
+    "選得好！(๑•̀ㅂ•́)و✧", 
+    "眼光真好！這款超熱門的！", 
+    "小精靈也會選這個 (๑•̀ㅂ•́)و✧", 
+    "感覺很適合呢！✨",
+    "加入成功！小精靈幫你把它放最上面！",
+    "好耶！(๑´ڡ`๑)",
+    "真不錯！",
+    "再來十個！",
+    "買買買！",
+    "您的品味獲得了小精靈的肯定！",
+    "這件確實是極品！",
+    "眼光犀利！",
+    "真會挑！",
+    "小精靈也很喜歡這個！",
+    "這個很讚喔！",
+    "老闆大器！",
+  ],
+
+  deselect: [
+    "不要了嗎？小精靈會想它的... (´;ω;`)", 
+    "為什麼取消了呢？再考慮看看嘛～", 
+    "沒關係，更好的在後面(･ω･` ;)", 
+    "真的不要了嗎？(´･ω･`)",
+    "只是選錯了對吧？",
+    "會想你的...",
+    "不要走！！",
+    "我們再把它加回來好嗎？(。•́〈•̀。)",
+    "看看不用錢，但小精靈還是希望你把它帶回家",
+    "哭哭... (。•́〈•̀。)",
+    "孤獨地回到冰冷的倉庫",
+    "我們無緣了嗎",
+    "再會了，我會想你的",
+    "嗚嗚... (´-﹏-`；)",
+    "小精靈正在努力抹掉剛才紀錄的痕跡... 消、消失吧！",
+    "可以再看看其他的",
+    "好吧ಥ_ಥ",
+    "正在重整您的挑選清單... (📋-ω-)"
+  ]
+};
+
+function triggerBuddy(type) {
+  const $bubble = $("#buddyBubble");
+  const quotes = BUDDY_QUOTES[type];
+  const text = quotes[Math.floor(Math.random() * quotes.length)];
+
+  $bubble.text(text).addClass("show");
+
+  // 清除舊的計時器
+  if (window.buddyTimer) clearTimeout(window.buddyTimer);
+  window.buddyTimer = setTimeout(() => {
+    $bubble.removeClass("show");
+  }, 1000);
+}
+
 const CART_KEY = "cart_items";
 
 // === 工具函式 ===
@@ -7,7 +63,6 @@ function getQueryParam(name) {
 }
 
 function loadProducts() {
-  // return fetch("data/products.json")
   return fetch(`${GAS_ENDPOINT}?action=getProducts`)
     .then(res => res.json())
     .catch(err => {
@@ -17,7 +72,7 @@ function loadProducts() {
 }
 
 function showToast(message) {
-  $(".selection-toast").remove(); // 避免多個吐司堆疊
+  $(".selection-toast").remove();
   const $toast = $(`<div class="selection-toast">${message}</div>`);
   $("body").append($toast);
   setTimeout(() => $toast.addClass("show"), 100);
@@ -32,17 +87,12 @@ function isOptionAvailable(item, selected) {
   if (item.status === 'coming_soon') return false;
   if (!item || !item.availableWhen) return true;
 
-  // 使用逻辑 Key (例如 size) 进行比对
   return Object.entries(item.availableWhen).every(([logicKey, allowedValues]) => {
     const currentVal = selected[logicKey];
-
-    // 瀑布流邏輯：如果依賴的欄位（如 size）還沒選，則下層選項（如 type）視為不可用
     if (currentVal === null || currentVal === undefined ||
       (Array.isArray(currentVal) && currentVal.length === 0)) {
       return false;
     }
-
-    // 比對值 (轉字串避免型別錯誤)
     return allowedValues.map(String).includes(String(currentVal));
   });
 }
@@ -71,7 +121,7 @@ function renderProduct(product, templates) {
   let selected = {};
   const colorKeys = Object.keys(product.images.colors || {});
 
-  // 1. 初始化選擇狀態 (使用 logical_key)
+  // 1. 初始化選擇狀態
   templates.forEach(t => {
     selected[t.key] = (t.type === "multi") ? [] : null;
   });
@@ -129,25 +179,20 @@ function renderProduct(product, templates) {
 
   // 瀑布流 UI 更新邏輯
   function updateUI(triggerSource = null) {
-    let isPreviousStepCompleted = true; // 第一步預設開啟
+    let isPreviousStepCompleted = true;
     let conflictMessages = [];
 
     templates.forEach((t, index) => {
-      // 確保選取到正確的 DOM 元素
       const $section = $(`#section-${index}`);
 
-      // === 功能 A：步驟鎖定 (Step Locking) ===
       if (!isPreviousStepCompleted) {
         $section.addClass('step-disabled').css('opacity', '0.3');
-        // 鎖定所有輸入框與按鈕
         $section.find('button, input').prop('disabled', true);
       } else {
         $section.removeClass('step-disabled').css('opacity', '1');
-        // 解鎖 (稍後會根據 isOptionAvailable 再次個別鎖定無效選項)
         $section.find('button, input').prop('disabled', false);
       }
 
-      // === 功能 B：檢查選項可用性與更新狀態 ===
       let hasValidSelection = false;
 
       t.items.forEach(item => {
@@ -157,10 +202,8 @@ function renderProduct(product, templates) {
           : $section.find(`.optionBtn[data-value="${item.value}"]`);
 
         if (!available) {
-          // 如果不可用：禁用按鈕
           $el.prop("disabled", true).addClass("disabled-item opacity-30");
 
-          // 只有當「目前已選的值」變成了「不可用」時，才清除選擇
           if (t.type === 'single' && String(selected[t.key]) === String(item.value)) {
             selected[t.key] = null;
             conflictMessages.push(`「${item.label}」與規格衝突，已取消選取`);
@@ -170,33 +213,27 @@ function renderProduct(product, templates) {
             conflictMessages.push(`加購項「${item.label}」不適用，已移除`);
           }
         } else {
-          // 如果可用：且該步驟未被鎖定，確保啟用
           if (isPreviousStepCompleted) {
             $el.prop("disabled", false).removeClass("disabled-item opacity-30");
           }
         }
 
-        // 更新 Active 視覺狀態
         if (t.type === 'multi') {
           const isChecked = selected[t.key].includes(String(item.value));
           $el.prop("checked", isChecked);
           if (isChecked) hasValidSelection = true;
         } else {
           const isActive = String(selected[t.key]) === String(item.value);
-          $el.toggleClass("active ", isActive)
-          //  .toggleClass("btn_sub", !isActive);
+          $el.toggleClass("active ", isActive);
           if (isActive) hasValidSelection = true;
         }
       });
 
-      // 3. 判斷必填項是否完成，決定下一步是否解鎖
-      // 如果必填但沒有有效選擇，下一個步驟將被鎖定
       if (t.required && !hasValidSelection) {
         isPreviousStepCompleted = false;
       }
     });
 
-    // 顏色按鈕處理 (獨立於瀑布流)
     $(`.optionBtn[data-key="color"]`).each(function () {
       const isAct = selected.color === $(this).data("value");
       $(this).toggleClass("active ", isAct).toggleClass("btn_sub", !isAct);
@@ -208,11 +245,15 @@ function renderProduct(product, templates) {
   }
 
   // === 生成 HTML 結構 ===
-  // 1. 先建立主結構並寫入 DOM (這樣後續的 selector 才能抓到東西)
   const html = `
     <div class="col-md-6">
       <div class="sticky-top" style="top: 20px; z-index: 1;">
-          <img id="mainImg" class="img-fluid rounded mb-3 w-100" style="object-fit: contain; max-height: 500px; background: #f8f9fa; border: 1px solid #eee;" src="${product.images.main}">
+          <div class="img-protect-container mb-3">
+              <div class="no-save-overlay" id="mainImgOverlay"></div>
+              <img id="mainImg" class="img-fluid rounded w-100" 
+                   style="object-fit: contain; max-height: 500px; background: #f8f9fa; border: 1px solid #eee;" 
+                   src="${product.images.main}" oncontextmenu="return false;">
+          </div>
           <div id="galleryThumbnails" class="gallery-scroll-container d-flex overflow-auto pb-2"></div>
       </div>
     </div>
@@ -228,7 +269,7 @@ function renderProduct(product, templates) {
         <label class="fw-bold">數量</label>
         <div class="input-group" style="width: 140px;">
             <button id="minusQty" class="btn btn_sub">-</button>
-            <input id="qty" type="number" class="form-control text-center" value="1" min="1">
+            <input id="qty" inputmode="numeric" class="form-control text-center" value="1" min="1">
             <button id="plusQty" class="btn btn_sub">+</button>
         </div>
       </div>
@@ -237,10 +278,8 @@ function renderProduct(product, templates) {
   `;
   $area.html(html);
 
-  // 2. 抓取剛剛放入 DOM 的 optionsArea，準備填充選項
   const $optArea = $("#optionsArea");
 
-  // 渲染顏色 (如有)
   if (colorKeys.length) {
     $optArea.append(`
       <div class="option-section mb-4" id="section-color">
@@ -252,7 +291,6 @@ function renderProduct(product, templates) {
     `);
   }
 
-  // 渲染瀑布流選項
   templates.forEach((t, index) => {
     const req = t.required ? "<span class='text-danger'>*</span>" : "";
     let inputHtml = "";
@@ -265,11 +303,15 @@ function renderProduct(product, templates) {
         </div>`).join("");
     } else {
       inputHtml = `<div class="d-flex flex-wrap gap-2">
-        ${t.items.map(item => `<button class="btn btn_sub optionBtn" data-key="${t.key}" data-value="${item.value}">${item.label}</button>`).join("")}
-      </div>`;
+  ${t.items.map(item => {
+        const isComingSoon = item.status === 'coming_soon';
+        const disabledAttr = isComingSoon ? 'disabled' : '';
+        const labelSuffix = isComingSoon ? ' (敬請期待)' : '';
+        return `<button class="btn btn_sub optionBtn" data-key="${t.key}" data-value="${item.value}" ${disabledAttr}>${item.label}${labelSuffix}</button>`;
+      }).join("")}
+</div>`;
     }
 
-    // 注意：ID 使用 section-${index} 確保與 updateUI 對應
     $optArea.append(`
       <div class="option-section mb-4" id="section-${index}" data-step="${index}">
         <div class="fw-bold mb-2">${t.label} ${req}</div>
@@ -278,39 +320,80 @@ function renderProduct(product, templates) {
     `);
   });
 
-  // === 事件綁定 (使用 delegate) ===
+  // === 加入全域結構 (燈箱與氣泡) ===
+  if ($("#fairyLightbox").length === 0) {
+    $("body").append(`
+        <div id="fairyLightbox">
+            <span class="lightbox-close">&times;</span>
+            <div class="lightbox-content-wrapper" style="position: relative; display: flex; max-width: 90%; max-height: 85vh;">
+                <div class="no-save-overlay" style="cursor:default; z-index: 10;"></div>
+                <img src="" id="lightboxImg" style="position: relative; z-index: 5; max-width: 100%; max-height: 100%; object-fit: contain;">
+            </div>
+        </div>
+        <div class="buddy-container">
+            <div id="buddyBubble" class="buddy-bubble"></div>
+        </div>
+    `);
+  }
 
-  // 選項按鈕點擊
+  // === 綁定全域事件 (確保不重複綁定) ===
+  $(document).off("click", "#mainImgOverlay").on("click", "#mainImgOverlay", function () {
+    const currentSrc = $("#mainImg").attr("src");
+    $("#lightboxImg").attr("src", currentSrc);
+    $("#fairyLightbox").fadeIn(300).css("display", "flex");
+  });
+
+  // 修改這裡！只在點擊「最外層背景」或「叉叉」時才關閉燈箱
+  $(document).off("click", "#fairyLightbox").on("click", "#fairyLightbox", function (e) {
+    if ($(e.target).is("#fairyLightbox") || $(e.target).is(".lightbox-close")) {
+      $(this).fadeOut(300);
+    }
+  });
+
+  // === 事件綁定 (選項點擊) ===
+
   $optArea.on("click", ".optionBtn", function () {
     const $sec = $(this).closest('.option-section');
-    // 如果該步驟被鎖定 (opacity 0.5)，則禁止點擊
     if ($sec.hasClass('step-disabled')) return;
 
     const key = $(this).data("key");
     const val = String($(this).data("value"));
 
+    // 1. 判斷現在這個按鈕是不是「已經被選中」的狀態
+    const isCurrentlyActive = (key === 'color') ? (selected.color === val) : (selected[key] === val);
+
+    // 2. 觸發氣泡：如果已經選中，點擊就是要「取消」(deselect)；反之就是「選取」(select)
+    triggerBuddy(isCurrentlyActive ? "deselect" : "select");
+
+    // 3. 把你不小心刪掉的賦值邏輯補回來！
     if (key === 'color') {
-      selected.color = (selected.color === val) ? null : val;
+      selected.color = isCurrentlyActive ? null : val;
     } else {
-      selected[key] = (selected[key] === val) ? null : val;
+      selected[key] = isCurrentlyActive ? null : val;
     }
+
     updateUI(val);
   });
 
-  // 多選複選框變更
   $optArea.on("change", ".addonCheckbox", function () {
     const $sec = $(this).closest('.option-section');
     if ($sec.hasClass('step-disabled')) return;
 
     const key = $(this).data("key");
     const val = String($(this).val());
+    const isChecked = $(this).is(":checked");
 
     if (!Array.isArray(selected[key])) selected[key] = [];
-    if ($(this).is(":checked")) {
+    
+    // 更新資料陣列
+    if (isChecked) {
       selected[key].push(val);
     } else {
       selected[key] = selected[key].filter(v => v !== val);
     }
+    
+    // 觸發氣泡：打勾就是選取，取消打勾就是取消
+    triggerBuddy(isChecked ? "select" : "deselect");
     updateUI(val);
   });
 
@@ -320,20 +403,17 @@ function renderProduct(product, templates) {
 
   // 加入購物車
   $("#addToCart").on("click", () => {
-    // 檢查顏色
     if (colorKeys.length > 0 && !selected.color) {
       showToast("請選擇顏色");
       $("#section-color")[0].scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    // 檢查規格必填
     for (let i = 0; i < templates.length; i++) {
       const t = templates[i];
       if (t.required) {
         const v = selected[t.key];
         if (!v || (Array.isArray(v) && v.length === 0)) {
           showToast(`請選擇 ${t.label}`);
-          // 捲動到對應的 index section
           $(`#section-${i}`)[0].scrollIntoView({ behavior: "smooth", block: "center" });
           return;
         }
@@ -344,85 +424,63 @@ function renderProduct(product, templates) {
     cart.push({
       productId: product.id,
       name: product.name,
-      selected: JSON.parse(JSON.stringify(selected)), // Deep copy
+      selected: JSON.parse(JSON.stringify(selected)), 
       unitPrice: calcPrice(product.basePrice, selected, templates),
       qty: parseInt($("#qty").val()) || 1
     });
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    fairyModal({
-    type: "info",
-    message: "商品已在推車裡囉，接下來想去哪裡呢？",
-    buttons: [
-        { text: "逛其他的", class: "btn_main", onClick: () => location.href = 'catalog.html' },
-        { text: "看購物車", class: "btn_main", onClick: () => location.href = 'cart.html' },
-        { text: "繼續留在這裡", class: "btn_sub", fullWidth: true } // fullWidth 會佔滿整行
-    ]
-});
+    
+    // 這裡我借用小精靈順便誇獎一下使用者
+    triggerBuddy("select");
+    setTimeout(() => {
+        fairyModal({
+          type: "info",
+          message: "商品已在推車裡囉，接下來想去哪裡呢？",
+          buttons: [
+            { text: "逛其他的", class: "btn_main", onClick: () => location.href = 'catalog.html' },
+            { text: "看購物車", class: "btn_main", onClick: () => location.href = 'cart.html' },
+            { text: "繼續留在這裡", class: "btn_sub", fullWidth: true } 
+          ]
+        });
+    }, 500); // 稍微延遲讓氣泡先跑出來
   });
 
-  // 4. 最後呼叫一次 updateUI 初始化狀態 (禁用未開啟的步驟)
   updateUI();
 }
 
 // 頁面初始化
 $(async () => {
-  // 1. 取得網址 ID 並處理 (去空白、轉大寫確保匹配 P001)
   const rawId = getQueryParam("id");
   const productId = rawId ? String(rawId).trim().toUpperCase() : null;
 
-  toggleLoading(true, "saving");
+  toggleLoading(true, "fetching");
 
   try {
     const data = await loadProducts();
-    console.log("從 GAS 抓取的原始資料:", data);
-
-    // 檢查資料結構是否完整
     if (!data || !data.products || !Array.isArray(data.products)) {
-      console.error("GAS 回傳結構錯誤:", data);
       $("#productArea").html("<div class='text-center pt-5'><h3>資料錯誤</h3></div><p class='text-center'>請聯繫管理員<br/>。・゜・(ノД`)・゜・。</p>");
       return;
     }
 
     if (!productId) {
-      console.error("網址缺少 id 參數");
       $("#productArea").html("<div class='text-center pt-5'><h3>請先選擇商品</h3></div><a class='btn btn_main' href='catalog.html'>回目錄</a>");
       return;
     }
 
-    // 2. 尋找商品 (強制兩邊都轉大寫字串比對)
     const product = data.products.find(p => String(p.id).toUpperCase() === productId);
 
     if (!product) {
-      console.error(`在產品清單中找不到 ID: ${productId}`);
       $("#productArea").html(`<div class='text-center pt-5'><h3>找不到商品 (${productId})</h3></div><p class='text-center'>請重新選擇商品</p><a class='btn btn_main' href='catalog.html'>回目錄</a>`);
       return;
     }
 
-    // 3. 檢查 Template 參照
-    console.log("當前商品的參照清單 (Refs):", product.optionTemplateRefs);
-    console.log("資料庫中所有的規格 Key (Templates):", Object.keys(data.optionTemplates));
-
     const templateObjects = product.optionTemplateRefs
-      .map(ref => {
-        const t = data.optionTemplates[ref];
-        if (!t) {
-          console.error(`❌ 找不到規格定義: 試算表要求 [${ref}]，但 Templates 表中只有:`, Object.keys(data.optionTemplates));
-        }
-        return t;
-      })
+      .map(ref => data.optionTemplates[ref])
       .filter(Boolean);
 
-    console.log("最終準備渲染的規格物件:", templateObjects);
-
-    if (templateObjects.length === 0) {
-      console.warn("警告：此商品沒有任何有效的規格選項可供渲染。");
-    }
-
-    // 4. 執行渲染
     renderProduct(product, templateObjects);
 
   } catch (error) {
-    console.error("載入流程發生嚴重錯誤:", error);
     $("#productArea").html("<div class='text-center py-5'><h3>連線發生錯誤，請重新整理</h3></div>");
   } finally {
     setTimeout(() => toggleLoading(false), 300);

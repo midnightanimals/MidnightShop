@@ -29,10 +29,89 @@
       </div>
     </div>
   </main>
+
+
+  <div id="eventModal" class="fairy-alert-overlay" style="display: none;">
+    <div class="fairy-alert-box event-box">
+      <button class="fairy-alert-close" id="closeModal">&times;</button>
+
+      <div class="fairy-alert-content">
+        <img src="your-event-image.jpg" alt="活動" class="event-banner" onerror="this.style.display='none'">
+
+        <div class="event-text">
+          <div class="fairy-alert-icon">✨</div>
+          <h3>開幕慶活動</h3>
+          <p>不限金額品項，只要下單就送眼片福袋<br>
+          <small>（尺寸根據您訂單裡的商品製作，款式隨機不可挑選）</small>
+          </p>
+        </div>
+      </div>
+
+      <div class="fairy-alert-footer">
+        <label class="no-show-option">
+          <input type="checkbox" id="noShowToday">
+          <span>今日不再顯示</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
   <div id="footer-placeholder"></div>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="js/main.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const modal = document.getElementById("eventModal");
+      const modalBox = modal.querySelector(".fairy-alert-box");
+      const closeBtn = document.getElementById("closeModal");
+      const noShowCheckbox = document.getElementById("noShowToday");
+
+      // --- 配置區 ---
+      const CONFIG = {
+        startDate: new Date("2026-03-01T00:00:00"),
+        endDate: new Date("2026-12-31T23:59:59"),
+        storageKey: "event_modal_skip_date"
+      };
+
+      const now = new Date();
+
+      // 1. 日期判斷
+      if (now < CONFIG.startDate || now > CONFIG.endDate) return;
+
+      // 2. 檢查「今日不再顯示」 (比對日期字串，當天有效)
+      const todayStr = now.toDateString();
+      if (localStorage.getItem(CONFIG.storageKey) === todayStr) return;
+
+      // 3. 執行顯示
+      modal.style.display = "flex";
+      // 延遲一小段時間加上 .show 以觸發 CSS Transition
+      setTimeout(() => {
+        modalBox.classList.add("show");
+      }, 10);
+
+      // 4. 關閉邏輯
+      function closeModal() {
+        modalBox.classList.remove("show");
+
+        // 如果勾選不再顯示，存入今天的日期字串
+        if (noShowCheckbox.checked) {
+          localStorage.setItem(CONFIG.storageKey, todayStr);
+        }
+
+        // 等動畫結束後隱藏外層
+        setTimeout(() => {
+          modal.style.display = "none";
+        }, 300);
+      }
+
+      closeBtn.addEventListener("click", closeModal);
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+    });
+  </script>
 </body>
 
 </html>

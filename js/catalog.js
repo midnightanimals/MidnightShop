@@ -97,7 +97,7 @@ $(async () => {
     products.forEach(p => {
       // 確保圖片路徑正確，若沒設定圖片給予預設圖
       const mainImg = p.images?.main || 'img/default-product.jpg';
-      const desc = p.description ? p.description.substring(0, 30) + '...' : '暫無商品描述';
+      const desc = p.description ? p.description.substring(0, 30) + '' : '暫無商品描述';
       
       const html = `
         <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">

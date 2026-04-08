@@ -1,36 +1,93 @@
-/* 自訂彈窗樣式 */
 .fairy-alert {
-    &-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 10000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        backdrop-filter: blur(3px);
-    }
+  &-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(3px);
+  }
 
-    &-box {
-        background: white;
-        border-radius: 15px;
-        padding: 30px;
-        width: 95%;
-        max-width: 450px;
-        text-align: center;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        &.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
+  &-box {
+    background: var(--bg-color); // 使用你的變數
+    border-radius: 15px;
+    padding: 0; // 改為 0，讓圖片可以填滿上方圓角
+    width: 95%;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden; // 確保圖片不超出圓角
+    position: relative;
+    
+    // 進場動畫初始狀態
+    transform: translateY(-20px);
+    opacity: 0;
 
-    &-icon {
-        font-size: 1rem;
-        margin-bottom: 15px;
+    &.show {
+      transform: translateY(0);
+      opacity: 1;
     }
+  }
+
+  &-icon {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: var(--brand-color);
+  }
+
+  // 專門為活動彈窗新增的子樣式
+  &-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--secondary-text-color);
+    cursor: pointer;
+    z-index: 11;
+    &:hover { color: var(--text-color); }
+  }
+
+  &-content {
+    .event-banner {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .event-text {
+      padding: 30px 30px 15px 30px;
+      font-family: $font-family-serif;
+      h3 { color: var(--primary-color); margin-bottom: 10px; }
+      p { color: var(--secondary-text-color); line-height: 1.6; }
+    }
+  }
+
+  &-footer {
+    padding: 15px 30px 25px;
+    display: flex;
+    justify-content: center;
+
+    .no-show-option {
+      font-size: 13px;
+      color: var(--secondary-text-color);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      
+      input {
+        accent-color: var(--brand-color);
+        cursor: pointer;
+      }
+    }
+  }
 }
+

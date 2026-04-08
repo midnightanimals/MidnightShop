@@ -681,7 +681,110 @@ a:hover {
           animation: shake 0.4s ease-in-out;
 }
 
-/* 自訂彈窗樣式 */
+/* 圖片保護遮罩 */
+.img-protect-container {
+  position: relative;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-user-drag: none;
+}
+
+.no-save-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0); /* 完全透明 */
+  cursor: -webkit-zoom-in;
+  cursor: zoom-in; /* 提示可以點擊放大 */
+}
+
+/* 全螢幕燈箱樣式 */
+#fairyLightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: none;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+#fairyLightbox img {
+  max-width: 90%;
+  max-height: 85%;
+  -o-object-fit: contain;
+     object-fit: contain;
+  -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 35px;
+  color: white;
+  cursor: pointer;
+  z-index: 10001;
+}
+
+/* 互動對話氣泡 */
+.buddy-container {
+  position: fixed;
+  right: 8rem;
+  bottom: 2rem;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.buddy-bubble {
+  background: white;
+  border: 2px solid var(--brand-color); /* 配合你的主色調 */
+  border-radius: 15px;
+  padding: 10px 18px;
+  position: relative;
+  -webkit-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  color: #555;
+  opacity: 0;
+  -webkit-transform: translateY(20px) scale(0.8);
+          transform: translateY(20px) scale(0.8);
+  -webkit-transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.buddy-bubble.show {
+  opacity: 1;
+  -webkit-transform: translateY(0) scale(1);
+          transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* 小箭頭 */
+.buddy-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  right: 20px;
+  border-width: 10px 10px 0;
+  border-style: solid;
+  border-color: var(--brand-color) transparent transparent;
+}
+
 .fairy-alert-overlay {
   position: fixed;
   top: 0;
@@ -702,9 +805,9 @@ a:hover {
   backdrop-filter: blur(3px);
 }
 .fairy-alert-box {
-  background: white;
+  background: var(--bg-color);
   border-radius: 15px;
-  padding: 30px;
+  padding: 0;
   width: 95%;
   max-width: 450px;
   text-align: center;
@@ -712,6 +815,11 @@ a:hover {
           box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
   -webkit-transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+  position: relative;
+  -webkit-transform: translateY(-20px);
+          transform: translateY(-20px);
+  opacity: 0;
 }
 .fairy-alert-box.show {
   -webkit-transform: translateY(0);
@@ -719,8 +827,69 @@ a:hover {
   opacity: 1;
 }
 .fairy-alert-icon {
-  font-size: 1rem;
+  font-size: 1.5rem;
   margin-bottom: 15px;
+  color: var(--brand-color);
+}
+.fairy-alert-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--secondary-text-color);
+  cursor: pointer;
+  z-index: 11;
+}
+.fairy-alert-close:hover {
+  color: var(--text-color);
+}
+.fairy-alert-content .event-banner {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.fairy-alert-content .event-text {
+  padding: 30px 30px 15px 30px;
+  font-family: "Noto Serif", "Playfair Display", serif;
+}
+.fairy-alert-content .event-text h3 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+.fairy-alert-content .event-text p {
+  color: var(--secondary-text-color);
+  line-height: 1.6;
+}
+.fairy-alert-footer {
+  padding: 15px 30px 25px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+.fairy-alert-footer .no-show-option {
+  font-size: 13px;
+  color: var(--secondary-text-color);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.fairy-alert-footer .no-show-option input {
+  accent-color: var(--brand-color);
+  cursor: pointer;
 }
 
 .admin-product-item {
