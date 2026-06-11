@@ -1,11 +1,32 @@
+#header-placeholder {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 99;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $transition-speed ease;
+
+  &.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
 .site-header {
   background-color: var(--header-bg);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-color);
   padding: $spacing-md 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
   transition:
     background-color $transition-speed ease,
     border-color $transition-speed ease;
@@ -30,13 +51,55 @@
     }
   }
 
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 28px;
+    height: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 101;
+
+    span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background-color: var(--text-color);
+      border-radius: 2px;
+      transition:
+        transform $transition-speed ease,
+        opacity $transition-speed ease;
+    }
+  }
+
+  &.nav-open {
+    .nav-toggle {
+      span:nth-child(1) {
+        transform: translateY(9px) rotate(45deg);
+      }
+      span:nth-child(2) {
+        opacity: 0;
+      }
+      span:nth-child(3) {
+        transform: translateY(-9px) rotate(-45deg);
+      }
+    }
+
+    .main-nav {
+      display: block;
+    }
+  }
+
   .main-nav {
     ul {
       margin: 0;
       padding: 0;
       list-style: none;
       display: flex;
-      gap: $spacing-lg;
+      gap: $spacing-sm;
     }
     a {
       text-decoration: none;
@@ -58,5 +121,33 @@
   .header-actions {
     display: flex;
     align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .nav-toggle {
+      display: flex;
+    }
+
+    .main-nav {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: var(--header-bg);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: $spacing-sm 0 $spacing-md;
+
+      ul {
+        flex-direction: column;
+        gap: 4px;
+        padding: 0 $spacing-md;
+      }
+
+      a {
+        display: block;
+      }
+    }
   }
 }

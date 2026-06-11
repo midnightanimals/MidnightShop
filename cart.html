@@ -12,7 +12,8 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Playfair+Display&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Playfair+Display&display=swap"
+    rel="stylesheet">
 
   <link href="css/style.css" rel="stylesheet">
 </head>
@@ -27,6 +28,7 @@
       <div id="cartArea"></div>
 
       <hr>
+
       <div class="mb-3">
         <label class="form-label">寄送方式</label>
         <select id="shippingMethod" class="form-select">
@@ -34,13 +36,20 @@
         </select>
       </div>
 
+      <div class="mb-3">
+        <label class="form-label">訂單備註（選填）</label>
+        <textarea id="orderNote" class="form-control" rows="3"></textarea>
+      </div>
 
       <div class="mb-3">
         <label>電子信箱 Email（會寄送一份訂單內容給您留存喔！）</label>
         <input id="ccEmail" class="form-control" placeholder="請輸入完整的電子信箱" type="email">
       </div>
 
-      <button id="sendOrder" class="btn btn-primary" disabled>發送訂單</button>
+      <div class="d-flex justify-content-end">
+        <button id="sendOrder" class="btn btn_main" disabled>發送訂單</button>
+      </div>
+
 
     </div>
   </main>

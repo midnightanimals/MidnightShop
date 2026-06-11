@@ -16,7 +16,7 @@
   &-box {
     background: var(--bg-color); // 使用你的變數
     border-radius: 15px;
-    padding: 0; // 改為 0，讓圖片可以填滿上方圓角
+    padding: 2rem 1rem;
     width: 95%;
     max-width: 450px;
     text-align: center;
@@ -82,9 +82,8 @@
       gap: 6px;
       cursor: pointer;
       user-select: none;
-      
+
       input {
-        accent-color: var(--brand-color);
         cursor: pointer;
       }
     }

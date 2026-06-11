@@ -9,8 +9,8 @@
     transition: all $transition-speed ease;
 
     &:focus {
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 0.25rem rgba(var(--accent-color-rgb), 0.25); // Need to get RGB for this
+      border-color: var(--brand-color);
+      box-shadow: 0 0 0 0.25rem rgba(var(--brand-color-rgb), 0.25);
       outline: none;
     }
   }
@@ -19,5 +19,88 @@
     font-family: $font-family-serif;
     font-weight: 500;
     margin-bottom: $spacing-sm / 2;
+  }
+}
+
+.form-check-input,
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  cursor: pointer;
+  position: relative;
+  vertical-align: middle;
+  transition: all $transition-speed ease;
+  border-radius: 0; // 統一使用直角設計，符合品牌風格
+  margin: 0;
+  display: inline-block;
+
+  // 勾選符號 (L 型線條)
+  &::after {
+    content: '';
+    position: absolute;
+    display: none;
+    left: 5px;
+    top: 1px;
+    width: 6px;
+    height: 10px;
+    border: solid var(--bg-color);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  &:checked {
+    background-color: var(--brand-color);
+    border-color: var(--brand-color);
+
+    &::after {
+      display: block;
+    }
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--brand-color);
+    box-shadow: 0 0 0 3px rgba(var(--brand-color-rgb), 0.3);
+  }
+
+  &:hover:not(:checked):not(:disabled) {
+    border-color: var(--brand-color);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--border-color);
+  }
+}
+
+// 修正 Bootstrap 的 .form-check 排版與間距
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding-left: 0;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+  margin-left: 2rem;
+
+  .form-check-input {
+    margin-top: 0;
+    flex-shrink: 0;
+  }
+
+  .form-check-label {
+    cursor: pointer;
+      display: flex;
+  align-items: center;
+    gap: .5rem;
+    margin-bottom: 0;
+    user-select: none;
+    color: var(--text-color);
+    font-size: 0.95rem;
   }
 }

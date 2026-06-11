@@ -26,17 +26,15 @@ const BUDDY_QUOTES = {
     "只是選錯了對吧？",
     "會想你的...",
     "不要走！！",
-    "我們再把它加回來好嗎？(。•́〈•̀。)",
-    "看看不用錢，但小精靈還是希望你把它帶回家",
+    "再把它加回來好嗎？(。•́〈•̀。)",
     "哭哭... (。•́〈•̀。)",
     "孤獨地回到冰冷的倉庫",
     "我們無緣了嗎",
-    "再會了，我會想你的",
+    "再會了，會想你的",
     "嗚嗚... (´-﹏-`；)",
-    "小精靈正在努力抹掉剛才紀錄的痕跡... 消、消失吧！",
-    "可以再看看其他的",
-    "好吧ಥ_ಥ",
-    "正在重整您的挑選清單... (📋-ω-)"
+    "小精靈努力抹掉剛才紀錄的痕跡... 消、消失吧！",
+    "ಥ_ಥ",
+    "正在重整挑選清單... (📋-ω-)"
   ]
 };
 
@@ -298,15 +296,15 @@ function renderProduct(product, templates) {
     if (t.type === 'multi') {
       inputHtml = t.items.map(item => `
         <div class="form-check mb-2">
-          <input class="form-check-input addonCheckbox" type="checkbox" value="${item.value}" data-key="${t.key}">
-          <label class="form-check-label">${item.label}</label>
+          <label class="form-check-label"><input class="form-check-input addonCheckbox" type="checkbox" value="${item.value}" data-key="${t.key}">
+          ${item.label}</label>
         </div>`).join("");
     } else {
       inputHtml = `<div class="d-flex flex-wrap gap-2">
   ${t.items.map(item => {
         const isComingSoon = item.status === 'coming_soon';
         const disabledAttr = isComingSoon ? 'disabled' : '';
-        const labelSuffix = isComingSoon ? ' (敬請期待)' : '';
+        const labelSuffix = isComingSoon ? ' (準備中)' : '';
         return `<button class="btn btn_sub optionBtn" data-key="${t.key}" data-value="${item.value}" ${disabledAttr}>${item.label}${labelSuffix}</button>`;
       }).join("")}
 </div>`;

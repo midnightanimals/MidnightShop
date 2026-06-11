@@ -19,13 +19,45 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // 載入 Header
-    loadComponent('#header-placeholder', '_header.html');
+    loadComponent('#header-placeholder', '_header.html', initNavToggle);
 
     // 載入 Footer，並在載入完成後初始化 FAB 按鈕
     loadComponent('#footer-placeholder', '_footer.html', () => {
         initFloatingActionButton();
     });
 });
+
+function initNavToggle() {
+    const toggle = document.querySelector('.nav-toggle');
+    const header = document.querySelector('.site-header');
+    if (!toggle || !header) return;
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'nav-backdrop';
+    document.body.appendChild(backdrop);
+
+    function openNav() {
+        header.classList.add('nav-open');
+        backdrop.classList.add('active');
+        toggle.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeNav() {
+        header.classList.remove('nav-open');
+        backdrop.classList.remove('active');
+        toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    toggle.addEventListener('click', () => {
+        header.classList.contains('nav-open') ? closeNav() : openNav();
+    });
+
+    backdrop.addEventListener('click', closeNav);
+
+    document.querySelectorAll('.main-nav a').forEach(link => {
+        link.addEventListener('click', closeNav);
+    });
+}
 
 // 將按鈕邏輯包裝成一個函數
 function initFloatingActionButton() {

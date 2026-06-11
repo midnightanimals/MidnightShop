@@ -1,0 +1,61 @@
+{
+  "featured": [
+    {
+      "src": "img/gallery/featured/1.jpg",
+      "caption": "2024 年精選作品"
+    },
+    {
+      "src": "img/gallery/featured/2.jpg",
+      "caption": "玻璃眼珠 × 珠光底"
+    },
+    {
+      "src": "img/gallery/featured/3.jpg",
+      "caption": "客製作品紀錄"
+    }
+  ],
+  "albums": [
+    {
+      "id": "eyes-glass-2024",
+      "title": "玻璃眼珠 2024",
+      "cover": "img/gallery/eyes-glass-2024/cover.jpg",
+      "description": "2024 年玻璃眼珠客製作品記錄",
+      "date": "2024-12",
+      "photos": [
+        {
+          "src": "img/gallery/eyes-glass-2024/03.jpg",
+          "caption": "12mm 玻璃眼珠 × 珠光底 × 消光處理",
+          "date": "2024-12-20"
+        },
+        {
+          "src": "img/gallery/eyes-glass-2024/02.jpg",
+          "caption": "10mm 玻璃眼珠 × 高清相片紙",
+          "date": "2024-11-05"
+        },
+        {
+          "src": "img/gallery/eyes-glass-2024/01.jpg",
+          "caption": "14mm 玻璃眼珠 × 亞銀底 × 珠光粉",
+          "date": "2024-09-18"
+        }
+      ]
+    },
+    {
+      "id": "commission-2023",
+      "title": "委託作品 2023",
+      "cover": "img/gallery/commission-2023/cover.jpg",
+      "description": "2023 年委託客製紀錄",
+      "date": "2023-11",
+      "photos": [
+        {
+          "src": "img/gallery/commission-2023/02.jpg",
+          "caption": "布娃娃客製眼珠 × 特殊配色",
+          "date": "2023-11-30"
+        },
+        {
+          "src": "img/gallery/commission-2023/01.jpg",
+          "caption": "球形關節娃娃眼珠訂製",
+          "date": "2023-08-10"
+        }
+      ]
+    }
+  ]
+}

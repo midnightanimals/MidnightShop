@@ -81,3 +81,43 @@
 #ccEmail {
   margin-bottom: $spacing-md;
 }
+
+// 購物車卡片 RWD
+.cart-close-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  // 增加可點擊範圍，視覺上不增加尺寸
+  padding: 0.25rem;
+}
+
+.cart-thumb {
+  object-fit: cover;
+  // 手機：橫幅大圖
+  width: 100%;
+  height: 140px;
+  border-radius: 6px;
+
+  // 桌機：小縮圖並排
+  @media (min-width: 576px) {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: 4px;
+  }
+}
+
+.cart-qty-row {
+  flex-wrap: nowrap;
+}
+
+.cart-qty-control {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.cart-price {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
